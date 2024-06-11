@@ -1,13 +1,43 @@
+const puppeteer = require('puppeteer');
 const express = require("express");
-const app = express();
-const port = process.env.PORT || 3001;
 
-app.get("/", (req, res) => res.type('html').send(html));
+const app = express();
+
+async function openWebPage() {
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.goto("https://quotes.toscrape.com");
+    await page.click('a[href="/login"]');
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await browser.close();
+}
+
+
+app.get("/consulta/:datos", (req, res) => {
+    const datos = req.params.datos;
+
+    openWebPage();
+
+    res.send("Hola mundo. Los datos que envias son: " + datos)
+});
+
+app.get('/api/:version', function(req, res) {
+    res.send(req.params.version);
+});
+
+
+const port = process.env.PORT || 3001;
 
 const server = app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
 server.keepAliveTimeout = 120 * 1000;
 server.headersTimeout = 120 * 1000;
+
+
+
+
+app.get("/", (req, res) => res.type('html').send(html));
+
 
 const html = `
 <!DOCTYPE html>
